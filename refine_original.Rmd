@@ -1,0 +1,130 @@
+
+
+---
+title: "R Notebook"
+output: github_document
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+1: Clean up brand names
+
+
+
+1.Clean up the 'company' column so all of the misspellings of the brand names are standardized. For example, you can transform the values in the column to be: philips, akzo, van houten and unilever (all lowercase).
+
+2: Separate product code and number
+
+Separate the product code and product number into separate columns i.e. add two new columns called product_code and product_number, containing the product code and number respectively
+
+3: Add product categories
+
+You learn that the product codes actually represent the following product categories:
+
+p = Smartphone
+
+v = TV
+
+x = Laptop
+
+q = Tablet
+
+In order to make the data more readable, add a column with the product category for each record.
+
+4: Add full address for geocoding
+
+You'd like to view the customer information on a map. In order to do that, the addresses need to be in a form that can be easily geocoded. Create a new column full_address that concatenates the three address fields (address, city, country), separated by commas.
+
+5: Create dummy variables for company and product category
+
+Both the company name and product category are categorical variables i.e. they take only a fixed set of values. In order to use them in further analysis you need to create dummy variables. Create dummy binary variables for each of them with the prefix company_ and product_ i.e.,
+
+Add four binary (1 or 0) columns for company: company_philips, company_akzo, company_van_houten and company_unilever.
+
+Add four binary (1 or 0) columns for product category: product_smartphone, product_tv, product_laptop and product_tablet.
+
+6: Submit the project on Github
+
+Include your code, the original data as a CSV file refine_original.csv, and the cleaned up data as a CSV file called refine_clean.csv.
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+library(readr)
+refine_original <- read_csv("~/R/first_submission/refine_original.csv")
+library("tidyr", lib.loc="~/R/win-library/3.4")
+library(dplyr)
+
+#1 Clean up brand names
+
+refine_original[1:7,1]="philips"
+refine_original[8:13,1]="akzo"
+refine_original[13:16,1]="philips"
+refine_original[17:21,1]="van houten"
+refine_original[22:25,1]="unilever"
+
+#2 Separate product code and number
+
+refine_original1 <- separate(refine_original,`Product code / number`,c('product_code','product_number'), sep="-")
+
+#3: Add product categories
+
+refine_original1$categories<- 'product categories'
+
+refine_original1$categories<-
+  replace(refine_original1$categories,refine_original1$product_code=="p","smartphone")
+
+refine_original1$categories<-
+  replace(refine_original1$categories,refine_original1$product_code=="v","TV")
+
+     refine_original1$categories<-
+       replace(refine_original1$categories,refine_original1$product_code=="x","Laptop")
+     
+  refine_original1$categories<-
+    replace(refine_original1$categories,refine_original1$product_code=="q","Tablet")
+  
+  #4: Add full address for geocoding
+   
+  refine_original2<-unite(refine_original1,'Full_address',address,city,country,sep = ',')
+  
+  #5: Create dummy variables for company and product category
+  
+  refine_original2$company_philips<- 
+    replace(refine_original2$company_philips,refine_original1$company=='philips',1)
+  
+  refine_original2$company_akzo<- 
+    replace(refine_original2$company_akzo,refine_original1$company=='akzo',1)
+  
+  refine_original2$company_van_houten<- 
+    replace(refine_original2$company_van_houten,refine_original1$company=='van houten',1)
+  
+  refine_original2$company_unilever<- 
+    replace(refine_original2$company_unilever,refine_original1$company=='unilever',1)
+  
+   refine_original2$product_smartphone <- 
+    replace(refine_original2$product_smartphone,refine_original1$categories=='smartphone',1)
+   
+    refine_original2$product_TV <- 
+    replace(refine_original2$product_TV,refine_original1$categories=='TV',1)
+    
+     refine_original2$product_Laptop <- 
+    replace(refine_original2$product_Laptop,refine_original1$categories=='Laptop',1)
+     
+     refine_original2$product_Tablet <- 
+    replace(refine_original2$product_Tablet,refine_original1$categories=='Tablet',1)
+     
+     refine_original2[is.na(refine_original2)]<- 0
+     
+     refine_clean<-refine_original2
+   
+      View(refine_clean) 
+      write_csv(refine_clean,"~/R/first_submission/refine_clean.csv")
+```
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+
+
+
+)
